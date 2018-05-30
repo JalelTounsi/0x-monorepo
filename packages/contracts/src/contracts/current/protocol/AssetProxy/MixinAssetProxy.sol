@@ -19,10 +19,10 @@
 pragma solidity ^0.4.24;
 pragma experimental ABIEncoderV2;
 
-import "./mixins/MAssetProxy.sol";
 import "./mixins/MAuthorizable.sol";
+import "./mixins/MAssetProxy.sol";
 
-contract MixinAssetProxy is 
+contract MixinAssetProxy is
     MAuthorizable,
     MAssetProxy
 {
@@ -36,7 +36,8 @@ contract MixinAssetProxy is
         bytes assetMetadata,
         address from,
         address to,
-        uint256 amount)
+        uint256 amount
+    )
         external
         onlyAuthorized
     {
@@ -57,7 +58,8 @@ contract MixinAssetProxy is
         bytes[] memory assetMetadata,
         address[] memory from,
         address[] memory to,
-        uint256[] memory amounts)
+        uint256[] memory amounts
+    )
         public
         onlyAuthorized
     {

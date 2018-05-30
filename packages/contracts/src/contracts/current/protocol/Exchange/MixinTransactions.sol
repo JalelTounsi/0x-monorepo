@@ -17,9 +17,9 @@
 */
 pragma solidity ^0.4.24;
 
+import "./libs/LibExchangeErrors.sol";
 import "./mixins/MSignatureValidator.sol";
 import "./mixins/MTransactions.sol";
-import "./libs/LibExchangeErrors.sol";
 
 contract MixinTransactions is
     LibExchangeErrors,
@@ -43,31 +43,35 @@ contract MixinTransactions is
         uint256 salt,
         address signer,
         bytes data,
-        bytes signature)
+        bytes signature
+    )
         external
     {
-        // Prevent reentrancy
-        require(currentContextAddress == address(0));
-
         // Calculate transaction hash
-        bytes32 transactionHash = keccak256(
+        bytes32 transactionHash = keccak256(abi.encodePacked(
             address(this),
             salt,
             data
+        ));
+
+        // Prevent reentrancy
+        require(
+            currentContextAddress == address(0),
+            REENTRANCY_ILLEGAL
         );
 
         // Validate transaction has not been executed
         require(
             !transactions[transactionHash],
-            DUPLICATE_TRANSACTION_HASH
+            INVALID_TX_HASH
         );
 
-        // TODO: is SignatureType.Caller necessary if we make this check?
+        // Transaction always valid if signer is sender of transaction
         if (signer != msg.sender) {
             // Validate signature
             require(
                 isValidSignature(transactionHash, signer, signature),
-                SIGNATURE_VALIDATION_FAILED
+                INVALID_TX_SIGNATURE
             );
 
             // Set the current transaction signer
@@ -78,7 +82,7 @@ contract MixinTransactions is
         transactions[transactionHash] = true;
         require(
             address(this).delegatecall(data),
-            TRANSACTION_EXECUTION_FAILED
+            FAILED_EXECUTION
         );
 
         // Reset current transaction signer
