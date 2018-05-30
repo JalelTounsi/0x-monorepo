@@ -76,6 +76,7 @@ contract LibOrder {
         // TODO: EIP712 is not finalized yet
         // Source: https://github.com/ethereum/EIPs/pull/712
         orderHash = keccak256(
+            "\x19\x01",
             DOMAIN_SEPARATOR_SCHEMA_HASH,
             keccak256(address(this)),
             ORDER_SCHEMA_HASH,

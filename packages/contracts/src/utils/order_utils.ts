@@ -5,6 +5,8 @@ import ethUtil = require('ethereumjs-util');
 import { crypto } from './crypto';
 import { CancelOrder, MatchOrder } from './types';
 
+const EIP_191_PREFIX = '\x19\x01';
+
 export const orderUtils = {
     createFill: (signedOrder: SignedOrder, takerAssetFillAmount?: BigNumber) => {
         const fill = {
@@ -91,6 +93,7 @@ export const orderUtils = {
         const domainSeparatorHashHex = this.getDomainSeparatorHashHex(order.exchangeAddress);
         const domainSeparatorSchemaHex = this.getDomainSeparatorSchemaHex();
         const orderHashBuff = crypto.solSHA3([
+            EIP_191_PREFIX,
             new BigNumber(domainSeparatorSchemaHex),
             new BigNumber(domainSeparatorHashHex),
             new BigNumber(orderSchemaHashHex),
